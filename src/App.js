@@ -1,25 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import { useQuery } from "react-query";
+import "./App.css";
+import axios from "axios";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+function Data() {
+  const { isLoading, isError, data, error, status } = useQuery(
+    ["todos"],
+    async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      /*       if (true) {
+        throw new Error();
+      } */
+      return axios
+        .get("https://jsonplaceholder.typicode.com/users/1/todos")
+        .then((res) => res.data);
+    }
+  );
+  if (data) console.log(data);
+  return isLoading ? (
+    "Loading..."
+  ) : isError ? (
+    "Error"
+  ) : (
+    <div>
+      {data.map((item) => (
+        <div key={item.title}>{item.title}</div>
+      ))}
     </div>
   );
+}
+
+function App() {
+  return <Data />;
 }
 
 export default App;
