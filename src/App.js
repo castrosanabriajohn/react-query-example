@@ -2,17 +2,22 @@ import { useQuery } from "react-query";
 import "./App.css";
 import axios from "axios";
 
-function Data({ queryKey }) {
-  const { isLoading, isError, data, isFetching } = useQuery(
-    [`${queryKey}`],
-    async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return axios
-        .get("https://jsonplaceholder.typicode.com/users/1/todos")
-        .then((res) => res.data);
-    }
-  );
+const useData = () => {
+  return useQuery(["Data"], async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return axios
+      .get("https://jsonplaceholder.typicode.com/users/1/todos")
+      .then((res) => res.data);
+  });
+};
 
+const Count = () => {
+  const { data } = useData();
+  if (data) return <h3>You have {data.length} todos</h3>;
+};
+
+const Data = () => {
+  const { isLoading, isError, data, isFetching } = useData();
   if (data) console.log(data);
   return isLoading ? (
     "Loading..."
@@ -20,20 +25,22 @@ function Data({ queryKey }) {
     "Error"
   ) : (
     <div>
-      {data.map((item) => (
-        <div key={item.title}>{item.title}</div>
-      ))}
+      <ul>
+        {data.map((item) => (
+          <li key={item.title}>{item.title}</li>
+        ))}
+      </ul>
       <br />
       {isFetching ? "Fetching...." : null}
     </div>
   );
-}
+};
 
 function App() {
   return (
     <div>
-      <Data queryKey="data" />
-      <Data queryKey="data" />
+      <Count />
+      <Data />
     </div>
   );
 }
