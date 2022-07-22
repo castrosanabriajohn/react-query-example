@@ -13,10 +13,10 @@ function Data() {
       return axios
         .get("https://jsonplaceholder.typicode.com/users/1/todos")
         .then((res) => res.data);
-    } /* ,
+    },
     {
-      refetchOnWindowFocus: false,
-    } */
+      staleTime: 5000, // the query is going to be marked as fresh before returning to stale state to be refetched
+    }
   );
   if (data) console.log(data);
   return isLoading ? (
