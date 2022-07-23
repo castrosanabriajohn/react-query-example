@@ -11,6 +11,54 @@ const useData = () => {
   });
 };
 
+const usePokemon = () => {
+  return useQuery(["Pokemon"], () => {
+    const res = axios.get("https://pokeapi.co/api/v2/pokemon/");
+    return res.data.results;
+  });
+};
+
+const useBerries = () => {
+  return useQuery(["Berries"], () => {
+    const res = axios
+      .get("https://pokeapi.co/api/v2/berry")
+      .then((res) => res.data.results);
+    return res;
+  });
+};
+
+const Pokemon = () => {
+  const { data, isFetching } = usePokemon();
+  if (data)
+    return (
+      <div>
+        <ol>
+          {data.map((item) => (
+            <li key={item.name}>{item.name}</li>
+          ))}
+        </ol>
+        <br />
+        {isFetching ? "Fetching" : null}
+      </div>
+    );
+};
+
+const Berries = () => {
+  const { data, isFetching } = useBerries();
+  if (data)
+    return (
+      <div>
+        <ol>
+          {data.map((item) => (
+            <li key={item.name}>{item.name}</li>
+          ))}
+        </ol>
+        <br />
+        {isFetching ? "Fetching" : null}
+      </div>
+    );
+};
+
 const Count = () => {
   const { data } = useData();
   if (data) return <h3>You have {data.length} todos</h3>;
@@ -41,6 +89,8 @@ function App() {
     <div>
       <Count />
       <Data />
+      <Pokemon />
+      <Berries />
     </div>
   );
 }
