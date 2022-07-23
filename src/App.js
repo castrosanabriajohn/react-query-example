@@ -1,6 +1,40 @@
 import { useQuery } from "react-query";
 import "./App.css";
 import axios from "axios";
+import { useState } from "react";
+
+const SpriteSearch = ({ target }) => {
+  const query = useQuery(
+    target,
+    () => {
+      const controller = new AbortController();
+      const promise = new Promise((res) => setTimeout(res, 3000))
+        .then(() => {
+          return axios.get(`https://pokeapi.co/api/v2/pokemon/${target}`, {
+            signal: controller.signal,
+          });
+        })
+        .then((res) => res.data.sprites.front_default);
+      promise.cancel = () => {
+        controller.abort();
+      };
+      return promise;
+    },
+    {
+      retry: false,
+      enabled: target !== "",
+    }
+  );
+  return query.isLoading ? (
+    "Loading"
+  ) : query.isError ? (
+    "Error"
+  ) : (
+    <div>
+      {query.data ? <img src={query.data} alt="Pokemon" /> : "Not found"}
+    </div>
+  );
+};
 
 const useData = () => {
   return useQuery(["Data"], async () => {
@@ -85,12 +119,11 @@ const Data = () => {
 };
 
 function App() {
+  const [target, setTarget] = useState("");
   return (
     <div>
-      <Count />
-      <Data />
-      <Pokemon />
-      <Berries />
+      <input value={target} onChange={(e) => setTarget(e.target.value)} />
+      <SpriteSearch target={target} />
     </div>
   );
 }
