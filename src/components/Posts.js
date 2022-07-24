@@ -1,37 +1,28 @@
 import { useQuery } from "react-query";
 import axios from "axios";
-
+import user from "./user";
 const email = "Sincere@april.biz";
 
 export const PostsById = () => {
-  const userIdQuery = useQuery("user", () =>
-    axios
-      .get(`https://jsonplaceholder.typicode.com/users?email=${email}`)
-      .then((res) => res.data[0])
-  );
-  const postsQuery = useQuery(
-    "posts",
-    () =>
-      axios
-        .get(
-          `https://jsonplaceholder.typicode.com/posts?userId=${userIdQuery.data.id}`
-        )
-        .then((res) => res.data),
+  const userIdQuery = useQuery(
+    "user",
+    async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return axios
+        .get(`https://jsonplaceholder.typicode.com/users?email=${email}`)
+        .then((res) => res.data[0]);
+    },
     {
-      enabled: userIdQuery.data?.id !== undefined,
+      initialData: user,
     }
   );
-  if (postsQuery.data && userIdQuery.data)
-    return (
-      <div>
-        User id: {userIdQuery.data.id}
-        <br />
-        <br />
-        {postsQuery.isLoading ? (
-          "loading"
-        ) : (
-          <div>Post count: {postsQuery.data.length}</div>
-        )}
-      </div>
-    );
+
+  return userIdQuery.isLoading ? (
+    "Loading"
+  ) : (
+    <div>
+      <pre>{JSON.stringify(userIdQuery.data, null, 2)}</pre>
+      {userIdQuery.isFetching ? "Fetching" : null}
+    </div>
+  );
 };
